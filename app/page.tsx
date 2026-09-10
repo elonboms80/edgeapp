@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { ReportTimeline, reportStyles } from './report-visuals';
 import { CoachReport } from './coach-report';
 import { formatMetric, metricDisplayUnit, insights } from '../lib/analytics';
 import { getLocalSessions, saveLocalSession } from '../lib/local-sessions';
@@ -138,7 +139,7 @@ function Progress({sessions}:{sessions:StoredSession[]}) {
   const selected=latest?.metrics.find(m=>m.key===key) || latest?.metrics[0];
   const matching=selected ? sessions.flatMap(s=>s.metrics.filter(m=>m.key===selected.key && m.unit===selected.unit).map(m=>({session:s,metric:m}))) : [];
   return <div className="page"><Header title="Season progress" action={<span className="pill">{sessions.length} sessions</span>}/><div className="statsTriplet"><div><b>{sessions.length}</b><span>Total sessions</span></div><div><b>{sessions.filter(s=>s.sessionType==='practice').length}</b><span>Practices</span></div><div><b>{sessions.filter(s=>s.sessionType==='game').length}</b><span>Games</span></div></div>
-    {latest && <><div className="sectionTitle"><h2>Recorded history</h2></div><label>Metric <select value={selected?.key} onChange={e=>setKey(e.target.value)}>{latest.metrics.map(m=><option key={m.key} value={m.key}>{m.label}</option>)}</select></label><section className="tableCard">{matching.map(({session,metric})=><div className="dataRow" key={session.id}><span>{session.sessionDate} · {session.sessionType}</span><strong>{formatMetric(metric)} {metricDisplayUnit(metric)}</strong></div>)}</section><Calculations session={latest}/></>}
+    {latest && <><div className="sectionTitle"><h2>Progress over time</h2></div><style>{reportStyles}</style><ReportTimeline sessions={sessions} session={latest}/><div className="sectionTitle"><h2>Recorded history</h2></div><label>Metric <select value={selected?.key} onChange={e=>setKey(e.target.value)}>{latest.metrics.map(m=><option key={m.key} value={m.key}>{m.label}</option>)}</select></label><section className="tableCard">{matching.map(({session,metric})=><div className="dataRow" key={session.id}><span>{session.sessionDate} · {session.sessionType}</span><strong>{formatMetric(metric)} {metricDisplayUnit(metric)}</strong></div>)}</section><Calculations session={latest}/></>}
     <section className="whyCard"><h3>{sessions.length<2 ? 'A baseline, not a trend yet' : 'Compare similar sessions'}</h3><p>More practices and games let us track changes in burst speed, acceleration, turnover, activity and load. Compare like-for-like sessions; drill mix and recording coverage can change the numbers.</p></section><section className="benchmarkCard"><h2>Peer comparison unavailable</h2><p>Peer percentages need a verified, comparable reference dataset. Your screenshots alone cannot establish a rank.</p></section></div>;
 }
 function Training() {

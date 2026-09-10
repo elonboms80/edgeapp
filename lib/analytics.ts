@@ -14,7 +14,7 @@ export function formatMetric(m: ExtractedMetric) {
   return String(m.value);
 }
 export function insights(session: StoredSession) {
-  const value = (key: string, unit: string) => session.metrics.find(m => m.key === key && m.unit === unit)?.value;
+  const value = (key: string, unit: string) => session.metrics.find(m => m.key === key && (unit === 'sec' ? isSeconds(m.unit) : m.unit === unit))?.value;
   const active = value('active_time', 'sec'), stride = value('stride_time', 'sec');
   const avg = value('burst_speed_avg', 'mph'), max = value('burst_speed_max', 'mph');
   const left = value('symmetry_left', '%'), right = value('symmetry_right', '%');
