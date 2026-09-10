@@ -36,5 +36,5 @@ export type StoredSession = {
   durationMinutes?: number;
   opponent?: string;
   metrics: ExtractedMetric[];
-  analysis: SessionAnalysis;
+  analysis?: SessionAnalysis;
 };

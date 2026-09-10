@@ -14,7 +14,7 @@ A mobile-first MVP for turning hockey tracking screenshots into verified session
 - UI for season trends, benchmarking, and development plans
 - Supabase production schema for players, sessions, images, metrics, analyses, and plans
 
-The sample percentile benchmark UI is deliberately marked as prototype data until a validated comparison dataset is connected.
+Home and Progress render only locally saved sessions. No sample metrics, invented trends, player profile, training diagnosis, or peer rankings are displayed. JSON session import stays in the browser; image extraction and optional AI analysis send data to the server and OpenAI. Personal session files must not be committed to this public repository.
 
 ## Run locally
 
