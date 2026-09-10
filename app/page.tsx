@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { CoachReport } from './coach-report';
 import { formatMetric, metricDisplayUnit, insights } from '../lib/analytics';
 import { getLocalSessions, saveLocalSession } from '../lib/local-sessions';
 import type { ExtractedMetric, ExtractionResult, SessionAnalysis, StoredSession } from '../lib/types';
@@ -30,6 +31,7 @@ function Home({setTab,sessions}:{setTab:(t:Tab)=>void;sessions:StoredSession[]})
   return <div className="page"><Header eyebrow="Your recorded sessions" title="Performance dashboard"/>
     <section className="heroCard"><div><span className="pill">{latest ? 'Recorded session' : 'Ready for your data'}</span><h2>{latest ? `${latest.sessionType} · ${latest.sessionDate}` : 'Start your season record'}</h2><p>{latest ? 'Your actual tracking metrics, with calculations kept separate from recorded values.' : 'Upload a tracking screenshot or import a session file to see your own metrics.'}</p></div><button className="primary" onClick={()=>setTab('upload')}>Add session</button></section>
     {latest && <><div className="sectionTitle"><h2>Performance snapshot</h2><button className="textButton" onClick={()=>setTab('progress')}>View progress →</button></div><MetricCards session={latest}/><Calculations session={latest}/><section className="whyCard"><h3>Missing measurements stay missing</h3><p>Only recorded metrics are shown. Active time is not total practice duration. No heart rate, hustle score, distance, or peer rank is inferred from other measurements.</p></section></>}
+    <CoachReport sessions={sessions}/>
     <p className="muted small">Sessions are saved in this browser. They do not sync across devices; keep your source screenshots or session files.</p>
   </div>;
 }
