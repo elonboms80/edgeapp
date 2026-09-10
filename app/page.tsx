@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { formatMetric, insights } from '../lib/analytics';
+import { formatMetric, metricDisplayUnit, insights } from '../lib/analytics';
 import { getLocalSessions, saveLocalSession } from '../lib/local-sessions';
 import type { ExtractedMetric, ExtractionResult, SessionAnalysis, StoredSession } from '../lib/types';
 
@@ -20,7 +20,7 @@ function BottomNav({tab,setTab}:{tab:Tab;setTab:(t:Tab)=>void}) {
 }
 
 function MetricCards({session}:{session:StoredSession}) {
-  return <div className="metricGrid">{session.metrics.map(m=><article className="metricCard" key={m.key}><div className="metricLabel">{m.label}</div><div className="metricValue">{formatMetric(m)}<span>{m.unit === 'sec' ? 'min:sec' : m.unit}</span></div><div className="muted small">Recorded · {session.sessionDate}</div></article>)}</div>;
+  return <div className="metricGrid">{session.metrics.map(m=><article className="metricCard" key={m.key}><div className="metricLabel">{m.label}</div><div className="metricValue">{formatMetric(m)}<span>{metricDisplayUnit(m)}</span></div><div className="muted small">Recorded · {session.sessionDate}</div></article>)}</div>;
 }
 function Calculations({session}:{session:StoredSession}) {
   return <><div className="sectionTitle"><h2>Calculated from this session</h2></div><div className="metricGrid">{insights(session).map(m=><article className="metricCard" key={m.label}><div className="metricLabel">{m.label}</div><div className="metricValue">{m.value}</div><p className="muted small">{m.note}</p></article>)}</div></>;
@@ -121,7 +121,7 @@ function Upload({onSaved}:{onSaved:()=>void}) {
     <div className="buttonRow"><button className="secondary" disabled={busy || saved} onClick={saveOnly}>{saved ? 'Saved to dashboard' : 'Save without AI'}</button><button className="secondary" disabled={busy} onClick={()=>setStage('select')}>Back</button><button className="primary" disabled={busy || saved} onClick={saveAndAnalyze}>{busy?'Analyzing…':'Save & Analyze'}</button></div></div>;
 
   if(stage==='analysis' && analysis) return <div className="page"><Header eyebrow={`${result?.sessionType || 'Session'} · ${result?.sessionDate || 'latest'}`} title="Session analysis" action={<span className="pill good">{analysis.rating}</span>}/>
-    <div className="metricGrid">{verified.slice(0,4).map(m=><article className="metricCard" key={m.key}><div className="metricLabel">{m.label}</div><div className="metricValue">{m.value}<span>{m.unit}</span></div><div className="muted small">Verified</div></article>)}</div>
+    <div className="metricGrid">{verified.slice(0,4).map(m=><article className="metricCard" key={m.key}><div className="metricLabel">{m.label}</div><div className="metricValue">{formatMetric(m)}<span>{metricDisplayUnit(m)}</span></div><div className="muted small">Verified</div></article>)}</div>
     <section className="analysisCard"><div className="coachMark">✦</div><div><h2>Coach's takeaway</h2><p>{analysis.summary}</p></div></section>
     <section className="ranked"><h2>Top focus areas</h2>{analysis.focusAreas.map((x,i)=><div key={x}><b>{i+1}</b><span>{x}</span></div>)}</section>
     <section className="focusCard"><div><span className="eyebrow">Training priority</span><h2>{analysis.trainingFocus}</h2></div></section>
@@ -136,7 +136,7 @@ function Progress({sessions}:{sessions:StoredSession[]}) {
   const selected=latest?.metrics.find(m=>m.key===key) || latest?.metrics[0];
   const matching=selected ? sessions.flatMap(s=>s.metrics.filter(m=>m.key===selected.key && m.unit===selected.unit).map(m=>({session:s,metric:m}))) : [];
   return <div className="page"><Header title="Season progress" action={<span className="pill">{sessions.length} sessions</span>}/><div className="statsTriplet"><div><b>{sessions.length}</b><span>Total sessions</span></div><div><b>{sessions.filter(s=>s.sessionType==='practice').length}</b><span>Practices</span></div><div><b>{sessions.filter(s=>s.sessionType==='game').length}</b><span>Games</span></div></div>
-    {latest && <><div className="sectionTitle"><h2>Recorded history</h2></div><label>Metric <select value={selected?.key} onChange={e=>setKey(e.target.value)}>{latest.metrics.map(m=><option key={m.key} value={m.key}>{m.label}</option>)}</select></label><section className="tableCard">{matching.map(({session,metric})=><div className="dataRow" key={session.id}><span>{session.sessionDate} · {session.sessionType}</span><strong>{formatMetric(metric)} {metric.unit==='sec'?'min:sec':metric.unit}</strong></div>)}</section><Calculations session={latest}/></>}
+    {latest && <><div className="sectionTitle"><h2>Recorded history</h2></div><label>Metric <select value={selected?.key} onChange={e=>setKey(e.target.value)}>{latest.metrics.map(m=><option key={m.key} value={m.key}>{m.label}</option>)}</select></label><section className="tableCard">{matching.map(({session,metric})=><div className="dataRow" key={session.id}><span>{session.sessionDate} · {session.sessionType}</span><strong>{formatMetric(metric)} {metricDisplayUnit(metric)}</strong></div>)}</section><Calculations session={latest}/></>}
     <section className="whyCard"><h3>{sessions.length<2 ? 'A baseline, not a trend yet' : 'Compare similar sessions'}</h3><p>More practices and games let us track changes in burst speed, acceleration, turnover, activity and load. Compare like-for-like sessions; drill mix and recording coverage can change the numbers.</p></section><section className="benchmarkCard"><h2>Peer comparison unavailable</h2><p>Peer percentages need a verified, comparable reference dataset. Your screenshots alone cannot establish a rank.</p></section></div>;
 }
 function Training() {

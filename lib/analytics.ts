@@ -1,7 +1,16 @@
 import type { ExtractedMetric, StoredSession } from './types';
 
+function isSeconds(unit: string) {
+  return ['s', 'sec', 'secs', 'second', 'seconds'].includes(unit.trim().toLowerCase());
+}
+export function metricDisplayUnit(m: ExtractedMetric) {
+  return isSeconds(m.unit) ? 'min:sec' : m.unit;
+}
 export function formatMetric(m: ExtractedMetric) {
-  if (m.unit === 'sec') return `${Math.floor(m.value / 60)}:${String(Math.round(m.value % 60)).padStart(2, '0')}`;
+  if (isSeconds(m.unit)) {
+    const seconds = Math.round(m.value);
+    return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+  }
   return String(m.value);
 }
 export function insights(session: StoredSession) {
